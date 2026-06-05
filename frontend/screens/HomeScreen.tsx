@@ -1,7 +1,7 @@
 import React, { useState, useCallback } from 'react';
-import { View, Text, FlatList, StyleSheet, TouchableOpacity, SafeAreaView } from 'react-native';
+import { View, Text, FlatList, StyleSheet, TouchableOpacity, SafeAreaView, Alert, Platform } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
-import { getExpenses } from '../services/api';
+import { getExpenses, deleteExpense } from '../services/api';
 
 const TEST_USER_ID = '00000000-0000-0000-0000-000000000001';
 
@@ -25,6 +25,33 @@ export default function HomeScreen({ navigation }: any) {
       console.error('Error fetching expenses:', error);
     }
   };
+
+  const handleDelete = (id: string, description: string) => {
+  if (Platform.OS === 'web') {
+    const confirmed = window.confirm(`Delete "${description}"?`);
+    if (confirmed) {
+      deleteExpense(id)
+        .then(() => fetchExpenses())
+        .catch(() => window.alert('Could not delete expense'));
+    }
+  } else {
+    Alert.alert('Delete Expense', `Delete "${description}"?`, [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Delete', style: 'destructive',
+        onPress: async () => {
+          try {
+            await deleteExpense(id);
+            fetchExpenses();
+          } catch (error) {
+            Alert.alert('Error', 'Could not delete expense');
+          }
+        }
+      }
+    ]);
+  }
+};
+   
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -64,7 +91,7 @@ export default function HomeScreen({ navigation }: any) {
       <FlatList
         data={expenses}
         keyExtractor={(item) => item.id}
-        contentContainerStyle={{ paddingHorizontal: 20 }}
+        contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 20 }}
         renderItem={({ item }) => (
           <View style={styles.expenseItem}>
             <View style={styles.expenseIcon}>
@@ -75,6 +102,9 @@ export default function HomeScreen({ navigation }: any) {
               <Text style={styles.expenseDate}>{item.date || 'Today'}</Text>
             </View>
             <Text style={styles.expenseAmount}>-${item.amount.toFixed(2)}</Text>
+            <TouchableOpacity onPress={() => handleDelete(item.id, item.description || 'this expense')} style={styles.deleteBtn}>
+              <Text style={styles.deleteText}>🗑</Text>
+            </TouchableOpacity>
           </View>
         )}
         ListEmptyComponent={
@@ -83,10 +113,7 @@ export default function HomeScreen({ navigation }: any) {
       />
 
       <View style={styles.fabContainer}>
-        <TouchableOpacity
-          style={styles.fab}
-          onPress={() => navigation.navigate('AddExpense')}
-        >
+        <TouchableOpacity style={styles.fab} onPress={() => navigation.navigate('AddExpense')}>
           <Text style={styles.fabText}>+ Add Expense</Text>
         </TouchableOpacity>
       </View>
@@ -116,7 +143,9 @@ const styles = StyleSheet.create({
   expenseInfo: { flex: 1 },
   expenseName: { fontSize: 14, fontWeight: '600', color: '#0d2d4f' },
   expenseDate: { fontSize: 12, color: '#888', marginTop: 2 },
-  expenseAmount: { fontSize: 14, fontWeight: '600', color: '#e57373' },
+  expenseAmount: { fontSize: 14, fontWeight: '600', color: '#e57373', marginRight: 8 },
+  deleteBtn: { padding: 4 },
+  deleteText: { fontSize: 16 },
   empty: { textAlign: 'center', color: 'rgba(255,255,255,0.5)', marginTop: 40, fontSize: 15 },
   fabContainer: { padding: 20 },
   fab: { backgroundColor: '#2e7d52', borderRadius: 14, padding: 16, alignItems: 'center' },

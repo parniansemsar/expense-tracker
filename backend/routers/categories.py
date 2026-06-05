@@ -20,3 +20,9 @@ def add_category(category: Category):
     from main import supabase
     response = supabase.table("categories").insert(category.dict()).execute()
     return response.data
+
+@router.delete("/categories/{category_id}")
+def delete_category(category_id: str):
+    from main import supabase
+    response = supabase.table("categories").delete().eq("id", category_id).execute()
+    return response.data
