@@ -1,18 +1,31 @@
 # Expense Tracker
 
-A full-stack mobile and web expense tracking app.
+A full-stack mobile and web expense tracking app built with React Native, FastAPI, and Supabase.
+
+## Screenshots
+
+<p float="left">
+  <img src="screenshots/1.png" width="200"/>
+  <img src="screenshots/2.png" width="200"/>
+  <img src="screenshots/3.png" width="200"/>
+  <img src="screenshots/4.png" width="200"/>
+</p>
 
 ## Tech Stack
 
-**Backend:** Python, FastAPI, Supabase (PostgreSQL)
+**Backend:** Python, FastAPI, Supabase (PostgreSQL)  
 **Frontend:** React Native, Expo, TypeScript
 
 ## Features
 
-- Add and view expenses
-- Categorize spending
-- Budget management
-- Runs on iOS, Android, and web from a single codebase
+- Add, view, and delete expenses and categories
+- Budget tracker with progress bar
+- Spending charts (line and bar)
+- Quick add shortcuts
+- Search and sort transactions
+- Category management with emoji icons
+- Profile screen with editable settings
+- Runs on iOS and web from a single codebase
 
 ## Project Structure
 
